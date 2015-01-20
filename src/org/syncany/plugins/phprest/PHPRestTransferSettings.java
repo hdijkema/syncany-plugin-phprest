@@ -39,7 +39,7 @@ public class PHPRestTransferSettings extends TransferSettings {
 	public String passwd;
 
 	@Element(name = "context", required = true)
-	@Setup(order = 3, description = "Context Identifier for this storage")
+	@Setup(order = 4, description = "Context Identifier for this storage")
 	public String context;
 	
 	

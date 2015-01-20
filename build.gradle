@@ -6,7 +6,7 @@ configurations {
 }
 
 project.ext {
-	pluginId = "PHPRest"
+	pluginId = "phprest"
 	pluginName = "PHPRest"
 	pluginVersion = "0.0.1-alpha"
 	pluginDebianVersion = "1"

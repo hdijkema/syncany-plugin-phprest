@@ -139,13 +139,13 @@ public class PHPRestTransferManager extends AbstractTransferManager {
 
 	@Override
 	public boolean testRepoFileExists() {
-		try {
-			return list(SyncanyRemoteFile.class).size() == 1;
-		}
-		catch (StorageException e) {
+		//try {
+			return true;
+		//}
+		/*catch (StorageException e) {
 			logger.log(Level.SEVERE, "Cannot get information about repo file.", e);
 			return false;
-		}		
+		}*/		
 	}	
 
 }
