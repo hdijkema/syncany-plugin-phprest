@@ -1,5 +1,11 @@
+bin
+build
 .gradle
-build/
-
-# Ignore Gradle GUI config
-gradle-app.setting
+.settings
+.classpath
+.project
+.metadata
+*.bak
+gradle/arch/syncany/pkg
+gradle/arch/syncany/src
+gradle/arch/syncany/syncany*.tar*
