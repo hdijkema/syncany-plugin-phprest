@@ -6,8 +6,8 @@ configurations {
 }
 
 project.ext {
-	pluginId = "phprest"
-	pluginName = "PHPRest"
+	pluginId = "php"
+	pluginName = "HTTP PHP backend plugin"
 	pluginVersion = "0.0.1-alpha"
 	pluginDebianVersion = "1"
 	pluginDate = new Date()

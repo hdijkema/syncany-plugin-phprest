@@ -19,8 +19,8 @@ package org.syncany.plugins.phprest;
 
 import org.syncany.plugins.transfer.TransferPlugin;
 
-public class PHPRestTransferPlugin extends TransferPlugin {
-	public PHPRestTransferPlugin() {
+public class PhpTransferPlugin extends TransferPlugin {
+	public PhpTransferPlugin() {
 		super("phprest");
 	}
 }

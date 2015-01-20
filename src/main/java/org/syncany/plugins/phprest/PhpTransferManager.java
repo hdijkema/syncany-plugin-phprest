@@ -29,16 +29,16 @@ import org.syncany.plugins.transfer.StorageException;
 import org.syncany.plugins.transfer.files.RemoteFile;
 import org.syncany.plugins.transfer.files.SyncanyRemoteFile;
 
-public class PHPRestTransferManager extends AbstractTransferManager {
-	private static final Logger logger = Logger.getLogger(PHPRestTransferManager.class.getSimpleName());
+public class PhpTransferManager extends AbstractTransferManager {
+	private static final Logger logger = Logger.getLogger(PhpTransferManager.class.getSimpleName());
 
 
-	public PHPRestTransferManager(PHPRestTransferSettings settings, Config config) throws Exception {
+	public PhpTransferManager(PhpTransferSettings settings, Config config) throws Exception {
 		super(settings, config);
 	}
 
-	public PHPRestTransferSettings getSettings() {
-		return (PHPRestTransferSettings) settings;
+	public PhpTransferSettings getSettings() {
+		return (PhpTransferSettings) settings;
 	}
 	
 	@Override

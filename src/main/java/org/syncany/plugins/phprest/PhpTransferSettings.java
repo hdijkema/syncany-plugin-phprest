@@ -23,8 +23,8 @@ import org.simpleframework.xml.Element;
 import org.syncany.plugins.transfer.Setup;
 import org.syncany.plugins.transfer.TransferSettings;
 
-public class PHPRestTransferSettings extends TransferSettings {
-	private static final Logger logger = Logger.getLogger(PHPRestTransferSettings.class.getSimpleName());
+public class PhpTransferSettings extends TransferSettings {
+	private static final Logger logger = Logger.getLogger(PhpTransferSettings.class.getSimpleName());
 
 	@Element(name = "url", required = true)
 	@Setup(order = 1, description = "URL for the REST site")
