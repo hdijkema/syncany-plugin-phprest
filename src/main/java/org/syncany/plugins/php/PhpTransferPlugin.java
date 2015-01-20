@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.syncany.plugins.phprest;
+package org.syncany.plugins.php;
 
 import org.syncany.plugins.transfer.TransferPlugin;
 
 public class PhpTransferPlugin extends TransferPlugin {
 	public PhpTransferPlugin() {
-		super("phprest");
+		super("php");
 	}
 }
