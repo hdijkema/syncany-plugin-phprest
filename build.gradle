@@ -23,6 +23,9 @@ project.ext {
 dependencies {
 	compile		project(":syncany-lib")
 	compile		project(":syncany-util")
+	compile     "org.apache.httpcomponents:httpmime:4.3.6"	
+
+	pluginjar	"org.apache.httpcomponents:httpmime:4.3.6"
 
 	testCompile	project(path: ":syncany-lib", configuration: "tests")
 	testCompile	project(path: ":syncany-util", configuration: "tests")
