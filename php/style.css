@@ -1,0 +1,42 @@
+
+body {
+	font-family: calibri, sans-serif;
+}
+
+h2 {
+	margin: 0px;
+}
+
+
+table.entrydetail, table.newplace, table.login, table.entries, table.menu {
+	border-spacing: 0;
+  border-collapse: collapse;
+  width: 40%;
+}
+
+/*table.entries {
+	  width: 50%;
+}*/
+
+table.entrydetail td, table.newplace td, table.login td, table.entries td, table.menu td, table.menu th {
+	border: 1px solid #c0c0c0;
+	padding: 0.2em;
+}
+
+input {
+	width: 100%;
+}
+
+table.menu td {
+	background: #d0d0d0;
+}
+
+table.menu td a {
+	text-decoration: none;
+	color: black;
+}
+
+table.menu td a:hover {
+	text-decoration: none;
+	font-weight: bold;
+}
