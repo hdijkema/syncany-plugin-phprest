@@ -201,7 +201,7 @@ public class PhpTransferManager extends AbstractTransferManager {
 
 				@Override
 				public int consumeResponse(InputStream s) throws Exception {
-					String response = getAnswer(s, 10);
+					String response = getAnswer(s);
 					if (response.equals("true")) {
 						return 1;
 					} else {
@@ -432,10 +432,11 @@ public class PhpTransferManager extends AbstractTransferManager {
 				}
 	
 				public int consumeResponse(InputStream s) throws Exception {
-					String response = getAnswer(s, 10);
+					String response = getAnswer(s);
 					if (response.equals("true")) {
 						return 1;
 					} else {
+						logger.log(Level.SEVERE, "response="+response);
 						return 0;
 					}
 				}

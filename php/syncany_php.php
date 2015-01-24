@@ -2,7 +2,7 @@
 
 $userid = $_POST[userid];
 $passwd = $_POST[passwd];
-$context = $_POST[passwd];
+$context = $_POST[context];
 $action = $_POST[action];
 
 $dir_context = "syncany/$context";
@@ -55,7 +55,7 @@ function action_login($userid, $passwd, $dir_context) {
        }
     }
     fclose($fh);
-    return "nok - userid or password not correct";
+    return "nok - userid or password not correct ($userid, $passwd, $dir_context)";
   } else {
     return "nok - login - no user file ($file_users)";
   }
