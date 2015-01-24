@@ -17,14 +17,13 @@
  */
 package org.syncany.plugins.php;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,19 +35,15 @@ import java.util.logging.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
-import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.syncany.config.Config;
 import org.syncany.plugins.transfer.AbstractTransferManager;
 import org.syncany.plugins.transfer.StorageException;
@@ -63,8 +58,6 @@ import org.syncany.plugins.transfer.files.TransactionRemoteFile;
 
 public class PhpTransferManager extends AbstractTransferManager {
 	private static final Logger logger = Logger.getLogger(PhpTransferManager.class.getSimpleName());
-	
-	private static int  MAX_ANSWER_LENGTH = 102400;
 	
 	private interface IPost {
 		/**
@@ -83,32 +76,27 @@ public class PhpTransferManager extends AbstractTransferManager {
 		public int consumeResponse(InputStream s) throws Exception;
 	};
 	
+	
 	public String getAnswer(InputStream s) throws Exception {
-		String line = "";
+		StringBuffer line = new StringBuffer();
 		int c = s.read();
 		while (c != -1 && c != '\n') {
-			line = line + new String(Character.toChars(c));
+			line.append(Character.toChars(c));
 			c = s.read();
 		}
-		if (c == '\n') { logger.info("End of line reached"); }
-		String answer = line;
-		logger.info("answer: "+ answer);
-		return answer;
+		return line.toString();
 	}
 
 	public String getAnswer(InputStream s, int maxlen) throws Exception {
-		String line = "";
+		StringBuffer line = new StringBuffer();
 		int c = s.read();
 		int t = 1;
 		while (c != -1 && c != '\n' && t < maxlen) {
-			line = line + new String(Character.toChars(c)); 
+			line.append(Character.toChars(c));
 			t = t + 1;
 			c = s.read();
 		}
-		if (c == '\n') { logger.info("End of line reached"); }
-		String answer = line;
-		logger.info("answer: "+ answer);
-		return answer;
+		return line.toString();
 	}
 
 
@@ -288,7 +276,7 @@ public class PhpTransferManager extends AbstractTransferManager {
 					}
 				}
 			});
-			//return (r == 1) ? true : false;
+			logger.info("result = " + r);
 		}
 		catch (Exception e) {
 			throw new StorageException(e);
@@ -299,8 +287,11 @@ public class PhpTransferManager extends AbstractTransferManager {
 		if (remoteFile.equals(MultichunkRemoteFile.class)) {
 			return "multichunk";
 		}
-		else if (remoteFile.equals(DatabaseRemoteFile.class) || remoteFile.equals(CleanupRemoteFile.class)) {
+		else if (remoteFile.equals(DatabaseRemoteFile.class)) {
 			return "database";
+		}
+		else if (remoteFile.equals(CleanupRemoteFile.class)) {
+			return "cleanup";
 		}
 		else if (remoteFile.equals(ActionRemoteFile.class)) {
 			return "action";
@@ -334,11 +325,39 @@ public class PhpTransferManager extends AbstractTransferManager {
 				public int consumeResponse(InputStream s) throws Exception {
 					String response = getAnswer(s,10);
 					if (response.equals("true")) {
-						String file = getAnswer(s);
-						while (file != "") {
-							T remoteFile = RemoteFile.createRemoteFile(file, _remoteFileClass);
-							fileList.put(file, remoteFile);
-							file = getAnswer(s);
+						byte[] buf = new byte[10240];
+						int len = s.read(buf);
+						String prev = "";
+						while (len > 0) {
+							String str = prev + new String(buf, 0, len, Charset.forName("UTF-8"));
+							logger.info("Got "+str);
+							String[] parts = str.split("\\s+");
+							logger.info("parts : "+parts.length);
+							int i;
+							for(i=0;i<parts.length-1;i++) {
+								try {
+									logger.info("part["+i+"]="+parts[i]);
+									T remoteFile = RemoteFile.createRemoteFile(parts[i], _remoteFileClass);
+									fileList.put(parts[i], remoteFile);
+								} catch (Exception e) {
+									logger.log(Level.INFO, "Cannot create instance of " + _remoteFileClass.getSimpleName() + " for file " + parts[i]
+											+ "; maybe invalid file name pattern. Ignoring file.");
+								}
+							}
+							prev = parts[i];
+							logger.info("prev = "+prev);
+							len = s.read(buf);
+							logger.info("len = "+len);
+						}
+						if (!prev.equals("")) {
+							try {
+								logger.info("prev = "+prev);
+								T remoteFile = RemoteFile.createRemoteFile(prev, _remoteFileClass);
+								fileList.put(prev, remoteFile);
+							} catch (Exception e) {
+								logger.log(Level.INFO, "Cannot create instance of " + _remoteFileClass.getSimpleName() + " for file " + prev
+										+ "; maybe invalid file name pattern. Ignoring file.");
+							}
 						}
 						return 1;
 					} else {

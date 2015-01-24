@@ -30,7 +30,7 @@ if ($action) {
       } else if ($action == "move") {
         $file = $_POST[filename];
         $fileto = $_POST[to_filename];
-        echo action_delete($userid, $passwd, $dir_context, $file, $fileto);
+        echo action_move($userid, $passwd, $dir_context, $file, $fileto);
       }
     } else {
       echo "nok - context '$context' doesn't exist";
