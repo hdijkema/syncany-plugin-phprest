@@ -1,17 +1,34 @@
 
 body {
 	font-family: calibri, sans-serif;
+	background: black;
+	color: white;
+	width: 600px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 h2 {
 	margin: 0px;
+	margin-bottom: 10px;
 }
 
+img.logo {
+	float: left;
+	width: 64px;
+}
+
+hr {
+	clear: both;
+	color: #eb1b1b;
+	background: #eb1b1b;
+	height: 3px;
+}
 
 table.entrydetail, table.newplace, table.login, table.entries, table.menu {
 	border-spacing: 0;
   border-collapse: collapse;
-  width: 40%;
+  width: 100%;
 }
 
 /*table.entries {
@@ -28,15 +45,19 @@ input {
 }
 
 table.menu td {
-	background: #d0d0d0;
+	background: #eb1b1b;
+	color: white;
 }
 
-table.menu td a {
-	text-decoration: none;
-	color: black;
-}
-
-table.menu td a:hover {
+a:link, a:hover, a:visited {
 	text-decoration: none;
 	font-weight: bold;
+}
+
+a:link, a:visited {
+		color: white;
+}
+
+a:hover {
+	color: #e0e0e0;
 }

@@ -34,7 +34,8 @@
   	<?php
   } else if (!file_exists("users")) {
   	?>
-  	<h2>Welcome at the Syncany PHP Backend administration site</h2>
+  	<h2>Welcome at the <a href="https://github.com/hdijkema/syncany-plugin-phprest" target="_blank">Syncany PHP Backend</a> administration site</h2>
+  	<a href="http://syncany.org" target="_blank"><img class="logo" src="syncany-logo.png" alt="logo" /></a>
   	<p>Create an administrator account for your syncany PHP Backend.</p>
   	<form action="index.php?action=install" method="POST">
   		<table class="accountcreate"><tr><td>Account:</td><td><input type="text" name="account" /></td></tr>
@@ -69,9 +70,11 @@
   	
   	if ($_SESSION[logged_in] != "true") {
   		?>
-  		  <h2>Syncany PHP Backend - Login</h2>
+  		  <h2><a href="https://github.com/hdijkema/syncany-plugin-phprest" target="_blank">Syncany PHP Backend</a> - Login</h2>
   		  <form action="index.php?action=login" method="POST">
-  		  	<table class="login"><tr><td>Account:</td><td><input type="text" name="account" /></td></tr>
+  		  	<table class="login">
+  		  	<tr><td rowspan="4" style="vertical-align: top;border: 0px solid black;width:70px;"><a href="http://syncany.org" target="_blank"><img class="logo" src="syncany-logo.png" alt="logo" /></a></td>
+  		  	    <td>Account:</td><td><input type="text" name="account" /></td></tr>
   		  	<tr><td>Password:</td><td><input type="password" name="password" /></td></tr>
   		  	<tr><td /><td /></tr>
   		  	<tr><td /><td><input type="submit" value="submit" /></td></tr>
@@ -81,8 +84,10 @@
   	} else {
   		?>
   		<table class="menu">
-  		  <tr><th colspan="3"><h2>Syncany PHP Backend - Administer places</h2></td></tr>
-  		  <tr><td><a href="index.php">clear</a></td><td><a href="index.php?action=logout">logout</a></td><td width="80%"/></tr></table>
+  		  <tr><th rowspan="2" style="border: 0px solid black;"><a href="http://syncany.org" target="_blank"><img class="logo" src="syncany-logo.png" alt="logo" /></a>
+  		      </th><th colspan="3"><h2><a href="https://github.com/hdijkema/syncany-plugin-phprest" target="_blank">Syncany PHP Backend</a> - Administer places</h2></td></tr>
+  		  <tr><td><a href="index.php">clear</a></td><td><a href="index.php?action=logout">logout</a></td><td width="80%"/></tr>
+  		  </table>
   		  <hr />
   		<?php
   		if ($action == "new_entry") {
