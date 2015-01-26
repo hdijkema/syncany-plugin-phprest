@@ -96,10 +96,20 @@
   		if ($action == "new_entry") {
   			$entry = $_POST[entry];
   			$password = $_POST[password];
-  			mkdir("syncany/$entry");
-  			$fh = fopen("syncany/$entry/users","wt");
-  			fputs($fh,"$entry:$password\n");
-  			fclose($fh);
+  			$entry = trim($entry);
+  			$password = trim($password);
+  			if($entry == "") {
+  				echo "<b>Cannot create entry '$entry'</b>";
+  		  } else {
+  				if (file_exists("syncany/$entry")) {
+  					echo "<b>Entry '$entry' already exists</b>";
+  				} else {
+  					mkdir("syncany/$entry");
+  					$fh = fopen("syncany/$entry/users","wt");
+  					fputs($fh,"$entry:$password\n");
+  					fclose($fh);
+  				}
+  			}
   		} else if ($action == "entry") {
   			$entry = $_GET[entry];
   			?>
