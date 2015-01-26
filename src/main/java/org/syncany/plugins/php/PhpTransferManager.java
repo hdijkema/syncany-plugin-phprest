@@ -24,6 +24,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.swing.JOptionPane;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -38,11 +47,18 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.syncany.config.Config;
 import org.syncany.plugins.transfer.AbstractTransferManager;
@@ -99,9 +115,47 @@ public class PhpTransferManager extends AbstractTransferManager {
 		return line.toString();
 	}
 
+	private String lastSite;
 
 	public PhpTransferManager(PhpTransferSettings settings, Config config) throws Exception {
 		super(settings, config);
+/*		
+		// Create a trust manager that does not validate certificate chains
+		TrustManager[] trustAllCerts = new TrustManager[]{
+		    new X509TrustManager() {
+		        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+		            return null;
+		        }
+		        
+		        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+		        }
+		        
+		        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+		        	if (lastSite != null && !lastSite.equals("")) {
+		        		int r = JOptionPane.showConfirmDialog(null, lastSite + "'s SSL certificate is not trusted, do you want to accept it?",
+		        											"Accept SSL Certificate?",
+		        											JOptionPane.YES_NO_OPTION,
+		        											JOptionPane.QUESTION_MESSAGE);
+		        		if (r == 0) {
+		        			
+		        		} else {
+		        			
+		        		}
+		        	}
+		        }
+		    }
+		};
+
+		// Install the all-trusting trust manager
+		try {
+		    SSLContext sc = SSLContext.getInstance("SSL");
+		    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+		    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot install SSL trust manager", e);
+		}
+		*/
+		
 	}
 
 	public PhpTransferSettings getSettings() {
@@ -448,6 +502,48 @@ public class PhpTransferManager extends AbstractTransferManager {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
+	private CloseableHttpClient getHttpClient() {
+	    try {
+	        @SuppressWarnings("deprecation")
+			SSLSocketFactory sf = new SSLSocketFactory(new TrustStrategy(){
+	            @Override
+	            public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+	            	if (lastSite != null && !lastSite.equals("")) {
+	            		Preferences prefs =  Preferences.userRoot().node(this.getClass().getName());
+	            		int prevr = prefs.getInt(lastSite, -1);
+	            		if (prevr == -1) {
+	            			int r = JOptionPane.showConfirmDialog(null, lastSite + "'s SSL certificate is not trusted, do you want to accept it?",
+	            					"Accept SSL Certificate?",
+	            					JOptionPane.YES_NO_OPTION,
+	            					JOptionPane.QUESTION_MESSAGE);
+		        			logger.warning(lastSite + " not trusted, user answered " + r);
+		        			prevr = r;
+		        			prefs.putInt(lastSite, r);
+	            		}
+	            		logger.warning(lastSite + " not trusted, registered user answer: " + prevr);
+		        		if (prevr == 0) {
+		        			return true;
+		        		} else {
+		        			return false;
+		        		}
+	            	} else {
+	            		return false;
+	            	}
+	            }
+	        });
+	        @SuppressWarnings("deprecation")
+			SchemeRegistry registry = new SchemeRegistry();
+	        registry.register(new Scheme("https", 443, sf));
+	        @SuppressWarnings("deprecation")
+			ClientConnectionManager ccm = new ThreadSafeClientConnManager(registry);
+	        return new DefaultHttpClient(ccm);
+	    } catch (Exception e) {
+	        return new DefaultHttpClient();
+	    }
+	}
+	
+	
 	private int operate(String action, IPost mutator) throws Exception {
 		String url = settings.getField("url")+"/syncany_php.php";
 		String context = settings.getField("context");
@@ -457,6 +553,7 @@ public class PhpTransferManager extends AbstractTransferManager {
 		logger.info("url: " + url);
 		logger.info("action: "+ action);
 		logger.info("userid: "+ userid + ", context: "+ context);
+		lastSite = url;
 		
 		HttpPost p = new HttpPost(url);
 		
@@ -472,7 +569,7 @@ public class PhpTransferManager extends AbstractTransferManager {
 		int responsecode = -1;
 		
 		try {
-			CloseableHttpClient httpclient = HttpClients.createDefault();
+			CloseableHttpClient httpclient = getHttpClient(); //HttpClients.createDefault();
 			CloseableHttpResponse response = httpclient.execute(p);
 			HttpEntity e = response.getEntity();
 			long len = e.getContentLength();

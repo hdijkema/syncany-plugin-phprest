@@ -15,6 +15,9 @@
   
   if ($action == "install") {
   	mkdir("syncany");
+  	$fh = fopen("syncany/.htaccess","wt");
+  	fputs($fh,"Options -Indexes\n");
+  	fclose($fh);
   	$account = $_POST[account];
   	$passwd = $_POST[password];
   	$account = trim($account);
@@ -122,7 +125,7 @@
   		  <?php
   		      $d = dir("syncany/");
   		      while (false !== ($entry = $d->read())) {
-  		      	if ($entry == "." || $entry =="..") {
+  		      	if ($entry == "." || $entry ==".." || substr($entry,0,1) == ".") {
   		      	} else {
   		      		echo "<tr><td><a href=\"index.php?action=entry&entry=$entry\">$entry</a></td></tr>";
   		      	}
