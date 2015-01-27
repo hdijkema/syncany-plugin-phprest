@@ -88,45 +88,45 @@
   		?>
   		<table class="menu">
   		  <tr><th rowspan="2" style="border: 0px solid black;"><a href="http://syncany.org" target="_blank"><img class="logo" src="syncany-logo.png" alt="logo" /></a>
-  		      </th><th colspan="3"><h2><a href="https://github.com/hdijkema/syncany-plugin-phprest" target="_blank">Syncany PHP Backend</a> - Administer places</h2></td></tr>
+  		      </th><th colspan="3"><h2><a href="https://github.com/hdijkema/syncany-plugin-phprest" target="_blank">Syncany PHP Backend</a> - Administer contexts</h2></td></tr>
   		  <tr><td><a href="index.php">clear</a></td><td><a href="index.php?action=logout">logout</a></td><td width="80%"/></tr>
   		  </table>
   		  <hr />
   		<?php
-  		if ($action == "new_entry") {
-  			$entry = $_POST[entry];
+  		if ($action == "new_context") {
+  			$context = $_POST[context];
   			$password = $_POST[password];
-  			$entry = trim($entry);
+  			$context = trim($context);
   			$password = trim($password);
-  			if($entry == "") {
-  				echo "<b>Cannot create entry '$entry'</b>";
+  			if($context == "") {
+  				echo "<b>Cannot create context '$context'</b>";
   		  } else {
-  				if (file_exists("syncany/$entry")) {
-  					echo "<b>Entry '$entry' already exists</b>";
+  				if (file_exists("syncany/$context")) {
+  					echo "<b>Entry '$context' already exists</b>";
   				} else {
-  					mkdir("syncany/$entry");
-  					$fh = fopen("syncany/$entry/users","wt");
-  					fputs($fh,"$entry:$password\n");
+  					mkdir("syncany/$context");
+  					$fh = fopen("syncany/$context/users","wt");
+  					fputs($fh,"$context:$password\n");
   					fclose($fh);
   				}
   			}
-  		} else if ($action == "entry") {
-  			$entry = $_GET[entry];
+  		} else if ($action == "context") {
+  			$context = $_GET[context];
   			?>
-  			<h3>Context: <?php echo $entry ?></h3>
-  			<table class="entrydetail">
-  			 <tr><td>user id:</td><td><?php echo $entry ?></td></tr>
+  			<h3>Context: <?php echo $context ?></h3>
+  			<table class="contextdetail">
+  			 <tr><td>user id:</td><td><?php echo $context ?></td></tr>
   			 <?php 
-  			 	 $fh = fopen("syncany/$entry/users","rt");
+  			 	 $fh = fopen("syncany/$context/users","rt");
   			 	 $up = fgets($fh);
   			 	 trim($up);
-  			 	 list($entry,$passwd) = preg_split("/:/",$up,2);
+  			 	 list($context,$passwd) = preg_split("/:/",$up,2);
   			 	 fclose($fh);
   			 ?>
   			 <tr><td>password:</td><td><?php echo $passwd ?></td></tr>
   			 <tr><td>size:</td><td>
   			   <?php 
-  			     $bytes=getDirectorySize("syncany/$entry");
+  			     $bytes=getDirectorySize("syncany/$context");
   			     $kb = bcdiv("$bytes", "1024");
   			     $mb = bcdiv("$bytes", "1048576", 1);
   			     $gb = bcdiv("$bytes", "1073741824", 1);
@@ -138,14 +138,14 @@
   		<?php
   		}
   		?>
-  		  <h3>Backends</h3>
+  		  <h3>Contexts</h3>
   		  <table class="entries">
   		  <?php
   		      $d = dir("syncany/");
-  		      while (false !== ($entry = $d->read())) {
-  		      	if ($entry == "." || $entry ==".." || substr($entry,0,1) == ".") {
+  		      while (false !== ($context = $d->read())) {
+  		      	if ($context == "." || $context ==".." || substr($context,0,1) == ".") {
   		      	} else {
-  		      		echo "<tr><td><a href=\"index.php?action=entry&entry=$entry\">$entry</a></td></tr>";
+  		      		echo "<tr><td><a href=\"index.php?action=context&context=$context\">$context</a></td></tr>";
   		      	}
   		      }
   		      $d->close();
@@ -153,8 +153,8 @@
   		   </table>
   		   <hr />
   		   <h3>New backend</h3>
-  		   <form action="index.php?action=new_entry" method="POST">
-  		      <table class="newplace"><tr><td>Syncany place:</td><td><input type="text" name="entry" /></td></tr>
+  		   <form action="index.php?action=new_context" method="POST">
+  		      <table class="newplace"><tr><td>Syncany context:</td><td><input type="text" name="context" /></td></tr>
   		      <tr><td>Password:</td><td><input type="text" name="password" /></td></tr>
   		      <tr><td /><td><input type="submit" value="submit" /></td></tr>
   		      </table>
