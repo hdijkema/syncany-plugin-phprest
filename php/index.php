@@ -124,7 +124,15 @@
   			 	 fclose($fh);
   			 ?>
   			 <tr><td>password:</td><td><?php echo $passwd ?></td></tr>
-  			 <tr><td>size:</td><td><?php $bytes=getDirectorySize("syncany/$entry");printf("%d bytes, %.0lf KB, %.0lf MB, %.1lf GB", $bytes,($bytes/1024),($bytes/1024/1024),($bytes/1024/1024/1024)); ?></td></tr>
+  			 <tr><td>size:</td><td>
+  			   <?php 
+  			     $bytes=getDirectorySize("syncany/$entry");
+  			     $kb = bcdiv("$bytes", "1024");
+  			     $mb = bcdiv("$bytes", "1048576", 1);
+  			     $gb = bcdiv("$bytes", "1073741824", 1);
+  			     printf("%s bytes, %s KB, %s MB, %s GB", $bytes,$kb,$mb,$gb); 
+  			   ?>
+  			  </td></tr>
   			</table>
   			<hr />
   		<?php
@@ -156,11 +164,11 @@
   }
   
   function getDirectorySize($path){
-    $bytestotal = 0;
+    $bytestotal = "0";
     $path = realpath($path);
     if($path!==false){
         foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)) as $object){
-            $bytestotal += $object->getSize();
+        	$bytestotal = bcadd($bytestotal, "".$object->getSize());
         }
     }
     return $bytestotal;
